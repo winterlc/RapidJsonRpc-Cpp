@@ -283,7 +283,7 @@ RAPIDJSON_NAMESPACE_BEGIN
          * \param value JSON message
          * \return string representation
          */
-        std::string GetString(const rapidjson::Value& value);
+        static std::string GetString(const rapidjson::Value& value);
 
       private:
          /**

@@ -35,9 +35,11 @@
  */
 int main(int argc, char** argv)
 {
-  Json::Rpc::TcpClient tcpClient(std::string("127.0.0.1"), 8086);
-  Json::Value query;
-  Json::FastWriter writer;
+  rapidjson::Rpc::TcpClient tcpClient(std::string("127.0.0.1"), 8086);
+  rapidjson::Document d;
+  rapidjson::Value query(rapidjson::kObjectType);
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   std::string queryStr;
   std::string responseStr;
   
@@ -58,11 +60,12 @@ int main(int argc, char** argv)
   }
 
   /* build JSON-RPC query */
-  query["jsonrpc"] = "2.0";
-  query["id"] = 1;
-  query["method"] = "print";
+  query.AddMember("jsonrpc", "2.0", d.GetAllocator());
+  query.AddMember("id", 1, d.GetAllocator());
+  query.AddMember("method", "print", d.GetAllocator());
 
-  queryStr = writer.write(query);
+  query.Accept(writer);
+  queryStr = std::string(buffer.GetString(), buffer.GetSize());
   std::cout << "Query is: " << queryStr << std::endl;
 
   if(tcpClient.Send(queryStr) == -1)

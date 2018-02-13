@@ -102,7 +102,6 @@ RAPIDJSON_NAMESPACE_BEGIN
       StringBuffer buffer;
       Writer<StringBuffer> writer(buffer);
       value.Accept(writer);
-      std::string(buffer.GetString(), buffer.GetSize());
       return std::string(buffer.GetString(), buffer.GetSize());
     }
 

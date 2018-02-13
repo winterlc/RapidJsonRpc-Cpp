@@ -25,7 +25,7 @@
 #ifndef TEST_RPC_H
 #define TEST_RPC_H 
 
-#include <json/json.h>
+#include <rapidjson/document.h>
 
 /**
  * \class TestRpc
@@ -40,7 +40,7 @@ class TestRpc
      * \param response JSON-RPC response
      * \return true if correctly processed, false otherwise
      */
-    bool Print(const Json::Value& root, Json::Value& response);
+    bool Print(const rapidjson::Value& root, rapidjson::Value& response);
     
     /**
      * \brief Notification.
@@ -48,13 +48,15 @@ class TestRpc
      * \param response JSON-RPC response
      * \return true if correctly processed, false otherwise
      */
-    bool Notify(const Json::Value& root, Json::Value& response);
+    bool Notify(const rapidjson::Value& root, rapidjson::Value& response);
     
     /**
      * \brief Get the description in JSON format.
      * \return JSON description
      */
-    Json::Value GetDescription();
+    rapidjson::Value GetDescription();
+private:
+    rapidjson::Document d;
 };
 
 #endif /* TEST_RPC_H */

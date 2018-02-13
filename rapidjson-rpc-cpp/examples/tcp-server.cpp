@@ -62,7 +62,7 @@ static void signal_handler(int code)
 int main(int argc, char** argv)
 {
   TestRpc a;
-  Json::Rpc::TcpServer server(std::string("127.0.0.1"), 8086);
+  rapidjson::Rpc::TcpServer server(std::string("127.0.0.1"), 8086);
 
   /* to avoid compilation warnings */
   (void)argc;
@@ -84,9 +84,9 @@ int main(int argc, char** argv)
     std::cout << "Error signal SIGINT will not be handled" << std::endl;
   }
 
-  server.AddMethod(new Json::Rpc::RpcMethod<TestRpc>(a, &TestRpc::Print,
+  server.AddMethod(new rapidjson::Rpc::RpcMethod<TestRpc>(a, &TestRpc::Print,
         std::string("print")));
-  server.AddMethod(new Json::Rpc::RpcMethod<TestRpc>(a, &TestRpc::Notify,
+  server.AddMethod(new rapidjson::Rpc::RpcMethod<TestRpc>(a, &TestRpc::Notify,
         std::string("notify")));
   
   /* server.SetEncapsulatedFormat(Json::Rpc::NETSTRING); */

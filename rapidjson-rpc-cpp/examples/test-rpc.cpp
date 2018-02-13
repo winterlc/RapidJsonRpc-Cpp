@@ -23,44 +23,45 @@
  */
 
 #include "test-rpc.h"
+#include "jsonrpc_handler.h"
 
 #include <iostream>
 
-bool TestRpc::Print(const Json::Value& root, Json::Value& response)
+bool TestRpc::Print(const rapidjson::Value& root, rapidjson::Value& response)
 {
-  std::cout << "Receive query: " << root << std::endl;
-  response["jsonrpc"] = "2.0";
-  response["id"] = root["id"];
-  response["result"] = "success";
+  std::cout << "Receive query: " << rapidjson::Rpc::Handler::GetString(root) << std::endl;
+  response.SetObject();
+  response.AddMember("jsonrpc", "2.0", d.GetAllocator());
+  response.AddMember("id", rapidjson::Value(root["id"], d.GetAllocator()).Move(), d.GetAllocator());
+  response.AddMember("result", "success", d.GetAllocator());
   return true;
 }
 
-bool TestRpc::Notify(const Json::Value& root, Json::Value& response)
+bool TestRpc::Notify(const rapidjson::Value& root, rapidjson::Value& response)
 {
-  std::cout << "Notification: " << root << std::endl;
-  response = Json::Value::null;
+  std::cout << "Notification: " << rapidjson::Rpc::Handler::GetString(root) << std::endl;
+  response.SetNull();
   return true;
 }
 
-Json::Value TestRpc::GetDescription()
+rapidjson::Value TestRpc::GetDescription()
 {
-  Json::FastWriter writer;
-  Json::Value root;
-  Json::Value parameters;
-  Json::Value param1;
+  rapidjson::Value root(rapidjson::kObjectType);
+  rapidjson::Value parameters(rapidjson::kObjectType);
+  rapidjson::Value param1(rapidjson::kObjectType);
 
-  root["description"] = "Print";
+  root.AddMember("description","Print", d.GetAllocator());
 
   /* type of parameter named arg1 */
-  param1["type"] = "integer";
-  param1["description"] = "argument 1";
+  param1.AddMember("type","integer", d.GetAllocator());
+  param1.AddMember("description","argument 1", d.GetAllocator());
 
   /* push it into the parameters list */
-  parameters["arg1"] = param1;
-  root["parameters"] = parameters;
+  parameters.AddMember("arg1",param1, d.GetAllocator());
+  root.AddMember("parameters",parameters, d.GetAllocator());
 
   /* no value returned */
-  root["returns"] = Json::Value::null;
+  root.AddMember("returns", rapidjson::Value().Move(), d.GetAllocator());
 
   return root;
 }

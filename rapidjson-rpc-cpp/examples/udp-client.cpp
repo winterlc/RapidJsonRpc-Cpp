@@ -37,13 +37,15 @@
  */
 int main(int argc, char** argv)
 {
-  Json::Rpc::UdpClient udpClient(std::string("127.0.0.1"), 8086);
-  Json::Value query;
-  Json::Value query1;
-  Json::Value query2;
-  Json::Value query3;
-  Json::Value query4;
-  Json::FastWriter writer;
+  rapidjson::Rpc::UdpClient udpClient(std::string("127.0.0.1"), 8086);
+  rapidjson::Document d;
+  rapidjson::Value query(rapidjson::kArrayType);
+  rapidjson::Value query1(rapidjson::kObjectType);
+  rapidjson::Value query2(rapidjson::kObjectType);
+  rapidjson::Value query3(rapidjson::kObjectType);
+  rapidjson::Value query4(rapidjson::kObjectType);
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   std::string queryStr;
   std::string responseStr;
 
@@ -64,25 +66,26 @@ int main(int argc, char** argv)
   }
 
   /* build JSON-RPC query */
-  query1["jsonrpc"] = "2.0";
-  query1["id"] = 1;
-  query1["method"] = "print";
+  query1.AddMember("jsonrpc", "2.0", d.GetAllocator());
+  query1.AddMember("id", 1, d.GetAllocator());
+  query1.AddMember("method", "print", d.GetAllocator());
 
-  query2["jsonrpc"] = "2.0";
-  query2["method"] = "notify";
+  query2.AddMember("jsonrpc", "2.0", d.GetAllocator());
+  query2.AddMember("method", "notify", d.GetAllocator());
 
-  query3["foo"] = "bar";
+  query3.AddMember("foo", "bar", d.GetAllocator());
 
-  query4["jsonrpc"] = "2.0";
-  query4["id"] = 4;
-  query4["method"] = "method";
+  query4.AddMember("jsonrpc", "2.0", d.GetAllocator());
+  query4.AddMember("id", 4, d.GetAllocator());
+  query4.AddMember("method", "method", d.GetAllocator());
 
-  query[(unsigned int)0] = query1;
-  query[(unsigned int)1] = query2;
-  query[(unsigned int)2] = query3;
-  query[(unsigned int)3] = query4;
+  query.PushBack(query1, d.GetAllocator());
+  query.PushBack(query2, d.GetAllocator());
+  query.PushBack(query3, d.GetAllocator());
+  query.PushBack(query4, d.GetAllocator());
 
-  queryStr = writer.write(query);
+  query.Accept(writer);
+  queryStr = std::string(buffer.GetString(), buffer.GetSize());
   std::cout << "Query is: " << queryStr << std::endl;
 
   if(udpClient.Send(queryStr) == -1)
