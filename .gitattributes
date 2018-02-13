@@ -1,0 +1,3 @@
+*.0 linguist-language=C++
+*.1 linguist-language=C++
+*.sh linguist-language=C++
