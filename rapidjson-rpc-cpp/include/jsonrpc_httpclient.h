@@ -31,8 +31,7 @@
 #include "jsonrpc_client.h"
 #include "system.h" 
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     /**
@@ -209,7 +208,7 @@ namespace Json
         system_util::Mutex m_mutex;
     };
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif /* JSONRPC_HTTPCLIENT_H */
 

@@ -30,8 +30,7 @@
 
 #include "networking.h"
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     /**
@@ -173,7 +172,7 @@ namespace Json
         enum EncapsulatedFormat m_format;
     };
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif /* JSONRPC_SERVER_H */
 

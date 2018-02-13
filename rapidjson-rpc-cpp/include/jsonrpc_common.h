@@ -37,6 +37,8 @@
 
 #endif
 
+#include <rapidjson/rapidjson.h>
+
 RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {

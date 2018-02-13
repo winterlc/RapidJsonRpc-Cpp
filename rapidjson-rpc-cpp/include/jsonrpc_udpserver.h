@@ -28,8 +28,7 @@
 #include "jsonrpc_common.h"
 #include "jsonrpc_server.h"
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     /**
@@ -96,7 +95,7 @@ namespace Json
 
     };
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif /* JSONRPC_UDPSERVER_H */
 

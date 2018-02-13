@@ -26,8 +26,7 @@
 
 #include "jsonrpc_client.h"
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     Client::Client()
@@ -39,7 +38,7 @@ namespace Json
       m_sock = -1;
       m_address = address;
       m_port = port;
-      SetEncapsulatedFormat(Json::Rpc::RAW);
+      SetEncapsulatedFormat(rapidjson::Rpc::RAW);
       memset(&m_sockaddr, 0x00, sizeof(struct sockaddr_storage));
       m_sockaddrlen = 0;
     }
@@ -101,5 +100,5 @@ namespace Json
       m_sock = -1;
     }
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 

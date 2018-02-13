@@ -24,8 +24,7 @@
 
 #include "jsonrpc_server.h"
 
-namespace Json 
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     Server::Server(const std::string& address, uint16_t port)
@@ -33,7 +32,7 @@ namespace Json
       m_sock = -1;
       m_address = address;
       m_port = port;
-      SetEncapsulatedFormat(Json::Rpc::RAW);
+      SetEncapsulatedFormat(rapidjson::Rpc::RAW);
     }
 
     Server::~Server()
@@ -92,5 +91,5 @@ namespace Json
       m_jsonHandler.DeleteMethod(method);
     }
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 

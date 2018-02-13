@@ -29,8 +29,7 @@
 
 #include "jsonrpc_client.h"
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     /**
@@ -84,7 +83,7 @@ namespace Json
 
     };
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif /* JSONRPC_UDPCLIENT_H */
 

@@ -26,8 +26,7 @@
 
 #include "netstring.h"
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     TcpClient::TcpClient(const std::string& address, uint16_t port) : Client(address, port)
@@ -44,7 +43,7 @@ namespace Json
       std::string rep = data;
 
       /* encoding if any */
-      if(GetEncapsulatedFormat() == Json::Rpc::NETSTRING)
+      if(GetEncapsulatedFormat() == rapidjson::Rpc::NETSTRING)
       {
         rep = netstring::encode(rep);
       }
@@ -66,7 +65,7 @@ namespace Json
       data = std::string(buf, nb);
 
       /* decoding if any */
-      if(GetEncapsulatedFormat() == Json::Rpc::NETSTRING)
+      if(GetEncapsulatedFormat() == rapidjson::Rpc::NETSTRING)
       {
         try
         {
@@ -81,5 +80,5 @@ namespace Json
       return nb;
     }
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 

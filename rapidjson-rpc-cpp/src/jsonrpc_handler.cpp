@@ -83,21 +83,21 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     bool Handler::SystemDescribe(const rapidjson::Value& msg, rapidjson::Value& response)
     {
-      Value methods(kObjectType);
+      rapidjson::Value methods(rapidjson::kObjectType);
       response.SetObject();
       response.AddMember("jsonrpc", "2.0", d.GetAllocator());
-      response.AddMember("id", Value(msg["id"], d.GetAllocator()).Move(), d.GetAllocator());
+      response.AddMember("id", rapidjson::Value(msg["id"], d.GetAllocator()).Move(), d.GetAllocator());
 
       for(std::list<CallbackMethod*>::iterator it = m_methods.begin() ; it != m_methods.end() ; it++)
       {
-        methods.AddMember(StringRef((*it)->GetName().c_str()), Value((*it)->GetDescription(), d.GetAllocator()).Move(), d.GetAllocator());
+        methods.AddMember(StringRef((*it)->GetName().c_str()), rapidjson::Value((*it)->GetDescription(), d.GetAllocator()).Move(), d.GetAllocator());
       }
       
       response.AddMember("result", methods, d.GetAllocator());
       return true;
     }
 
-    std::string Handler::GetString(rapidjson::Value value)
+    std::string Handler::GetString(const rapidjson::Value& value)
     {
       StringBuffer buffer;
       Writer<StringBuffer> writer(buffer);
@@ -108,14 +108,14 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     bool Handler::Check(const rapidjson::Value& root, rapidjson::Value& error)
     {
-      Value err(kObjectType);
+      rapidjson::Value err(rapidjson::kObjectType);
       
       /* check the JSON-RPC version => 2.0 */
       if(!root.IsObject() || !root.HasMember("jsonrpc") ||
           root["jsonrpc"] != "2.0") 
       {
         error.SetObject();
-        error.AddMember("id", Value().Move(), d.GetAllocator());
+        error.AddMember("id", rapidjson::Value().Move(), d.GetAllocator());
         error.AddMember("jsonrpc", "2.0", d.GetAllocator());
         
         err.AddMember("code", INVALID_REQUEST, d.GetAllocator());
@@ -127,7 +127,7 @@ RAPIDJSON_NAMESPACE_BEGIN
       if(root.HasMember("id") && (root["id"].IsArray() || root["id"].IsObject()))
       {
         error.SetObject();
-        error.AddMember("id", Value().Move(), d.GetAllocator());
+        error.AddMember("id", rapidjson::Value().Move(), d.GetAllocator());
         error.AddMember("jsonrpc", "2.0", d.GetAllocator());
 
         err.AddMember("code", INVALID_REQUEST, d.GetAllocator());
@@ -140,7 +140,7 @@ RAPIDJSON_NAMESPACE_BEGIN
       if(!root.HasMember("method") || !root["method"].IsString())
       {
         error.SetObject();
-        error.AddMember("id", Value().Move(), d.GetAllocator());
+        error.AddMember("id", rapidjson::Value().Move(), d.GetAllocator());
         error.AddMember("jsonrpc", "2.0", d.GetAllocator());
 
         err.AddMember("code", INVALID_REQUEST, d.GetAllocator());
@@ -154,7 +154,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     bool Handler::Process(const rapidjson::Value& root, rapidjson::Value& response)
     {
-      Value error;
+      rapidjson::Value error;
       std::string method;
 
       if(!Check(root, error))
@@ -176,7 +176,7 @@ RAPIDJSON_NAMESPACE_BEGIN
       
       /* forge an error response */
       response.SetObject();
-      response.AddMember("id", root.HasMember("id") ? Value(root["id"], d.GetAllocator()).Move() : Value().Move(), d.GetAllocator());
+      response.AddMember("id", root.HasMember("id") ? rapidjson::Value(root["id"], d.GetAllocator()).Move() : rapidjson::Value().Move(), d.GetAllocator());
       response.AddMember("jsonrpc", "2.0", d.GetAllocator());
 
       error.SetObject();
@@ -189,8 +189,8 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     bool Handler::Process(const std::string& msg, rapidjson::Value& response)
     {
-      Value root;
-      Value error;
+      rapidjson::Value root;
+      rapidjson::Value error;
       bool parsing = true;
 
       /* parsing */
@@ -207,7 +207,7 @@ RAPIDJSON_NAMESPACE_BEGIN
       {
         response.SetObject();
         /* request or batched call is not in JSON format */
-        response.AddMember("id", Value().Move(), d.GetAllocator());
+        response.AddMember("id", rapidjson::Value().Move(), d.GetAllocator());
         response.AddMember("jsonrpc","2.0", d.GetAllocator());
         
         error.SetObject();
@@ -226,10 +226,10 @@ RAPIDJSON_NAMESPACE_BEGIN
 
         for(i = 0 ; i < root.Size() ; i++)
         {
-          Value ret;
+          rapidjson::Value ret;
           Process(root[i], ret);
           
-          if(ret != Value())
+          if(!ret.IsNull())
           {
             /* it is not a notification, add to array of responses */
             response.PushBack(ret, d.GetAllocator());

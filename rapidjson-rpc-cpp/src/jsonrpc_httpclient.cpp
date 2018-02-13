@@ -29,8 +29,7 @@
 #include "jsonrpc_httpclient.h"
 #include "netstring.h"
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     HttpClient::HttpClient()
@@ -273,6 +272,6 @@ namespace Json
       return -1; 
     }
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif

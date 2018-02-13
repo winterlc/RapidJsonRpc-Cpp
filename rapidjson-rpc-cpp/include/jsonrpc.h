@@ -32,15 +32,15 @@
  * major * 10000 + minor * 100 + micro\n
  * So version 1.2.3 produces 10203.
  */
-static const int JSONRPC_CPP_VERSION = 500;
+static const int JSONRPC_CPP_VERSION = 610;
 
 /**
  * \brief JsonRpc-Cpp version in string format.
  */
-static const char JSONRPC_CPP_VERSION_STRING[] = "0.5.0";
+static const char JSONRPC_CPP_VERSION_STRING[] = "0.6.1";
 
-/* include from external jsoncpp lib */
-#include <json/json.h>
+/* include from external rapidjson lib */
+#include <rapidjson/document.h>
 
 /* include all headers from JsonRpc-Cpp lib */
 #include "jsonrpc_common.h"
@@ -63,8 +63,7 @@ static const char JSONRPC_CPP_VERSION_STRING[] = "0.5.0";
  * \namespace Json
  * \brief JSON (JavaScript Object Notation).
  */
-namespace Json 
-{
+RAPIDJSON_NAMESPACE_BEGIN
   /**
    * \namespace Json::Rpc
    * \brief JSON-RPC (remote procedure call using JSON as encoding format).
@@ -72,7 +71,7 @@ namespace Json
   namespace Rpc
   {
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif /* JSONRPC_H */
 

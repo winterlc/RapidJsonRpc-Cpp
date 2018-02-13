@@ -29,8 +29,7 @@
 
 #include "netstring.h"
 
-namespace Json 
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     UdpServer::UdpServer(const std::string& address, uint16_t port) : Server(address, port)
@@ -48,7 +47,7 @@ namespace Json
       std::string rep = data;
 
       /* encoding if any */
-      if(GetEncapsulatedFormat() == Json::Rpc::NETSTRING)
+      if(GetEncapsulatedFormat() == rapidjson::Rpc::NETSTRING)
       {
         rep = netstring::encode(rep);
       }
@@ -58,7 +57,7 @@ namespace Json
 
     bool UdpServer::Recv(int fd)
     {
-      Json::Value response;
+      rapidjson::Value response;
       ssize_t nb = -1;
       char buf[1500];
       struct sockaddr_storage addr;
@@ -70,7 +69,7 @@ namespace Json
       {
         std::string msg = std::string(buf, nb);
 
-        if(GetEncapsulatedFormat() == Json::Rpc::NETSTRING)
+        if(GetEncapsulatedFormat() == rapidjson::Rpc::NETSTRING)
         {
           try
           {
@@ -88,12 +87,12 @@ namespace Json
         m_jsonHandler.Process(msg, response);
 
         /* in case of notification message received, the response could be Json::Value::null */
-        if(response != Json::Value::null)
+        if(!response.IsNull())
         {
           std::string rep = m_jsonHandler.GetString(response);
 
           /* encoding */
-          if(GetEncapsulatedFormat() == Json::Rpc::NETSTRING)
+          if(GetEncapsulatedFormat() == rapidjson::Rpc::NETSTRING)
           {
             rep = netstring::encode(rep);
           }
@@ -145,5 +144,5 @@ namespace Json
       }
     }
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 

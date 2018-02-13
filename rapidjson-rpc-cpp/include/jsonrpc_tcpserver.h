@@ -30,8 +30,7 @@
 #include "jsonrpc_common.h"
 #include "jsonrpc_server.h"
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     /**
@@ -127,7 +126,7 @@ namespace Json
         std::list<int> m_purge;
     };
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif /* JSONRPC_TCPSERVER_H */
 
