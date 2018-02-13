@@ -37,8 +37,7 @@
 
 #endif
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     /**
@@ -71,7 +70,7 @@ namespace Json
       INTERNAL_ERROR = -32603 /**< Internal JSON-RPC error. */
     };
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif /* JSONRPC_COMMON_H */
 

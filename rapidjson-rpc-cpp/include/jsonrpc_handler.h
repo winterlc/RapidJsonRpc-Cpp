@@ -30,12 +30,13 @@
 #include <string>
 #include <list>
 
-#include <json/json.h>
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 #include "jsonrpc_common.h"
 
-namespace Json 
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     /**
@@ -58,7 +59,7 @@ namespace Json
          * \return true if message has been correctly processed, false otherwise
          * \note Have to be implemented by subclasses
          */
-        virtual bool Call(const Json::Value& msg, Json::Value& response) = 0;
+        virtual bool Call(const rapidjson::Value& msg, rapidjson::Value& response) = 0;
 
         /**
          * \brief Get the name of the methods (optional).
@@ -71,7 +72,7 @@ namespace Json
          * \brief Get the description of the methods (optional).
          * \return description
          */
-        virtual Json::Value GetDescription() const = 0;
+        virtual const rapidjson::Value& GetDescription() const = 0;
     };
 
     /**
@@ -93,8 +94,8 @@ namespace Json
          * \typedef Method
          * \brief T method signature.
          */
-        typedef bool (T::*Method)(const Json::Value& msg,
-            Json::Value& response);
+        typedef bool (T::*Method)(const rapidjson::Value& msg,
+            rapidjson::Value& response);
 
         /**
          * \brief Constructor.
@@ -104,7 +105,7 @@ namespace Json
          * \param description method description (in JSON format)
          */
         RpcMethod(T& obj, Method method, const std::string& name,
-            const Json::Value description = Json::Value::null)
+            rapidjson::Value& description = rapidjson::Value())
         {
           m_obj = &obj;
           m_name = name;
@@ -120,7 +121,7 @@ namespace Json
          * \note JSON-RPC's notification method MUST set response to
          * Json::Value::null
          */
-        virtual bool Call(const Json::Value& msg, Json::Value& response)
+        virtual bool Call(const rapidjson::Value& msg, rapidjson::Value& response)
         {
           return (m_obj->*m_method)(msg, response);
         }
@@ -138,7 +139,7 @@ namespace Json
          * \brief Get the description of the methods (optional).
          * \return description
          */
-        virtual Json::Value GetDescription() const
+        virtual const rapidjson::Value& GetDescription() const
         {
           return m_description;
         }
@@ -161,7 +162,8 @@ namespace Json
         /**
          * \brief JSON reader.
          */
-        Json::Reader m_reader;
+        //Json::Reader m_reader;
+        rapidjson::Document d;
 
         /**
          * \brief Object pointer.
@@ -181,7 +183,7 @@ namespace Json
         /**
          * \brief JSON-formated description of the RPC method.
          */
-        Json::Value m_description;
+        rapidjson::Value m_description;
     };
 
     /**
@@ -255,7 +257,7 @@ namespace Json
          * \note in case msg is a notification, response is equal to
          * Json::Value::null and the return value is true.
          */
-        bool Process(const std::string& msg, Json::Value& response);
+        bool Process(const std::string& msg, rapidjson::Value& response);
 
         /**
          * \brief Process a JSON-RPC message.
@@ -266,7 +268,7 @@ namespace Json
          * \note in case msg is a notification, response is equal to
          * Json::Value::null and the return value is true.
          */
-        bool Process(const char* msg, Json::Value& response);
+        bool Process(const char* msg, rapidjson::Value& response);
 
         /**
          * \brief RPC method that get all the RPC methods and their description.
@@ -274,14 +276,14 @@ namespace Json
          * \param response response
          * \return true if processed correctly, false otherwise
          */
-        bool SystemDescribe(const Json::Value& msg, Json::Value& response);
+        bool SystemDescribe(const rapidjson::Value& msg, rapidjson::Value& response);
 
         /**
          * \brief Get a std::string representation of Json::Value.
          * \param value JSON message
          * \return string representation
          */
-        std::string GetString(Json::Value value);
+        std::string GetString(rapidjson::Value value);
 
       private:
          /**
@@ -301,12 +303,17 @@ namespace Json
         /**
          * \brief JSON reader.
          */
-        Json::Reader m_reader;
+        //Json::Reader m_reader;
 
         /**
          * \brief JSON writer.
          */
-        Json::FastWriter m_writer;
+        //Json::FastWriter m_writer;
+
+        /**
+        * \brief rapidjson document.
+        */
+        rapidjson::Document d;
 
         /**
          * \brief List of RPC methods.
@@ -326,7 +333,7 @@ namespace Json
          * \param error complete JSON-RPC error message if method failed
          * \return true if the message is a JSON one, false otherwise
          */
-        bool Check(const Json::Value& root, Json::Value& error);
+        bool Check(const rapidjson::Value& root, rapidjson::Value& error);
 
         /**
          * \brief Process a JSON-RPC object message.
@@ -337,10 +344,10 @@ namespace Json
          * \note In case msg is a notification, response is equal to
          * Json::Value::null and the return value is true.
          */
-        bool Process(const Json::Value& root, Json::Value& response);
+        bool Process(const rapidjson::Value& root, rapidjson::Value& response);
     };
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
 #endif /* JSONRPC_HANDLER_H */
 

@@ -24,8 +24,7 @@
 
 #include "jsonrpc_handler.h"
 
-namespace Json
-{
+RAPIDJSON_NAMESPACE_BEGIN
   namespace Rpc
   {
     CallbackMethod::~CallbackMethod()
@@ -37,12 +36,12 @@ namespace Json
       /* add a RPC method that list the actual RPC methods contained in 
        * the Handler 
        */
-      Json::Value root;
+      Value root(rapidjson::kObjectType);
 
-      root["description"] = "List the RPC methods available";
-      root["parameters"] = Json::Value::null;
-      root["returns"] = 
-        "Object that contains description of all methods registered";
+      root.AddMember("description", "List the RPC methods available", d.GetAllocator());
+      root.AddMember("parameters", rapidjson::Value(), d.GetAllocator());
+      root.AddMember("returns",
+        "Object that contains description of all methods registered", d.GetAllocator());
 
       AddMethod(new RpcMethod<Handler>(*this, &Handler::SystemDescribe,
             std::string("system.describe"), root));
@@ -82,72 +81,80 @@ namespace Json
       }
     }
 
-    bool Handler::SystemDescribe(const Json::Value& msg, Json::Value& response)
+    bool Handler::SystemDescribe(const rapidjson::Value& msg, rapidjson::Value& response)
     {
-      Json::Value methods;
-      response["jsonrpc"] = "2.0";
-      response["id"] = msg["id"];
+      Value methods(kObjectType);
+      response.SetObject();
+      response.AddMember("jsonrpc", "2.0", d.GetAllocator());
+      response.AddMember("id", Value(msg["id"], d.GetAllocator()).Move(), d.GetAllocator());
 
       for(std::list<CallbackMethod*>::iterator it = m_methods.begin() ; it != m_methods.end() ; it++)
       {
-        methods[(*it)->GetName()] = (*it)->GetDescription();
+        methods.AddMember(StringRef((*it)->GetName().c_str()), Value((*it)->GetDescription(), d.GetAllocator()).Move(), d.GetAllocator());
       }
       
-      response["result"] = methods;
+      response.AddMember("result", methods, d.GetAllocator());
       return true;
     }
 
-    std::string Handler::GetString(Json::Value value)
+    std::string Handler::GetString(rapidjson::Value value)
     {
-      return m_writer.write(value);
+      StringBuffer buffer;
+      Writer<StringBuffer> writer(buffer);
+      value.Accept(writer);
+      std::string(buffer.GetString(), buffer.GetSize());
+      return std::string(buffer.GetString(), buffer.GetSize());
     }
 
-    bool Handler::Check(const Json::Value& root, Json::Value& error)
+    bool Handler::Check(const rapidjson::Value& root, rapidjson::Value& error)
     {
-      Json::Value err;
+      Value err(kObjectType);
       
       /* check the JSON-RPC version => 2.0 */
-      if(!root.isObject() || !root.isMember("jsonrpc") ||
+      if(!root.IsObject() || !root.HasMember("jsonrpc") ||
           root["jsonrpc"] != "2.0") 
       {
-        error["id"] = Json::Value::null;
-        error["jsonrpc"] = "2.0";
+        error.SetObject();
+        error.AddMember("id", Value().Move(), d.GetAllocator());
+        error.AddMember("jsonrpc", "2.0", d.GetAllocator());
         
-        err["code"] = INVALID_REQUEST;
-        err["message"] = "Invalid JSON-RPC request.";
-        error["error"] = err;
+        err.AddMember("code", INVALID_REQUEST, d.GetAllocator());
+        err.AddMember("message", "Invalid JSON-RPC request.", d.GetAllocator());
+        error.AddMember("error", err, d.GetAllocator());
         return false;
       }
 
-      if(root.isMember("id") && (root["id"].isArray() || root["id"].isObject()))
+      if(root.HasMember("id") && (root["id"].IsArray() || root["id"].IsObject()))
       {
-        error["id"] = Json::Value::null;
-        error["jsonrpc"] = "2.0";
+        error.SetObject();
+        error.AddMember("id", Value().Move(), d.GetAllocator());
+        error.AddMember("jsonrpc", "2.0", d.GetAllocator());
 
-        err["code"] = INVALID_REQUEST;
-        err["message"] = "Invalid JSON-RPC request.";
-        error["error"] = err;
+        err.AddMember("code", INVALID_REQUEST, d.GetAllocator());
+        err.AddMember("message", "Invalid JSON-RPC request.", d.GetAllocator());
+        error.AddMember("error", err, d.GetAllocator());
         return false;
       }
 
       /* extract "method" attribute */
-      if(!root.isMember("method") || !root["method"].isString())
+      if(!root.HasMember("method") || !root["method"].IsString())
       {
-        error["id"] = Json::Value::null;
-        error["jsonrpc"] = "2.0";
+        error.SetObject();
+        error.AddMember("id", Value().Move(), d.GetAllocator());
+        error.AddMember("jsonrpc", "2.0", d.GetAllocator());
 
-        err["code"] = INVALID_REQUEST;
-        err["message"] = "Invalid JSON-RPC request.";
-        error["error"] = err;
+        err.AddMember("code", INVALID_REQUEST, d.GetAllocator());
+        err.AddMember("message", "Invalid JSON-RPC request.", d.GetAllocator());
+        error.AddMember("error", err, d.GetAllocator());
         return false;
       }
 
       return true;
     }
 
-    bool Handler::Process(const Json::Value& root, Json::Value& response)
+    bool Handler::Process(const rapidjson::Value& root, rapidjson::Value& response)
     {
-      Json::Value error;
+      Value error;
       std::string method;
 
       if(!Check(root, error))
@@ -156,7 +163,7 @@ namespace Json
         return false;
       }
 
-      method = root["method"].asString();
+      method = root["method"].GetString();
       
       if(method != "")
       {
@@ -168,52 +175,64 @@ namespace Json
       }
       
       /* forge an error response */
-      response["id"] = root.isMember("id") ? root["id"] : Json::Value::null;
-      response["jsonrpc"] = "2.0";
+      response.SetObject();
+      response.AddMember("id", root.HasMember("id") ? Value(root["id"], d.GetAllocator()).Move() : Value().Move(), d.GetAllocator());
+      response.AddMember("jsonrpc", "2.0", d.GetAllocator());
 
-      error["code"] = METHOD_NOT_FOUND;
-      error["message"] = "Method not found.";
-      response["error"] = error;
+      error.SetObject();
+      error.AddMember("code", METHOD_NOT_FOUND, d.GetAllocator());
+      error.AddMember("message", "Method not found.", d.GetAllocator());
+      response.AddMember("error", error, d.GetAllocator());
 
       return false;
     }
 
-    bool Handler::Process(const std::string& msg, Json::Value& response)
+    bool Handler::Process(const std::string& msg, rapidjson::Value& response)
     {
-      Json::Value root;
-      Json::Value error;
-      bool parsing = false;
+      Value root;
+      Value error;
+      bool parsing = true;
 
       /* parsing */
-      parsing = m_reader.parse(msg, root);
+      //parsing = m_reader.parse(msg, root);
+      d.Parse(msg.c_str());
+      if (d.IsArray())
+          root = d.GetArray();
+      else if (d.IsObject())
+          root = d.GetObject();
+      else
+          parsing = false;
       
       if(!parsing)
       {
+        response.SetObject();
         /* request or batched call is not in JSON format */
-        response["id"] = Json::Value::null;
-        response["jsonrpc"] = "2.0";
+        response.AddMember("id", Value().Move(), d.GetAllocator());
+        response.AddMember("jsonrpc","2.0", d.GetAllocator());
         
-        error["code"] = PARSING_ERROR;
-        error["message"] = "Parse error.";
-        response["error"] = error; 
+        error.SetObject();
+        error.AddMember("code",PARSING_ERROR, d.GetAllocator());
+        error.AddMember("message", "Parse error.", d.GetAllocator());
+        response.AddMember("error", error, d.GetAllocator());
         return false;
       }
       
-      if(root.isArray())
+      if(root.IsArray())
       {
         /* batched call */
-        Json::Value::ArrayIndex i = 0;
-        Json::Value::ArrayIndex j = 0;
-        
-        for(i = 0 ; i < root.size() ; i++)
+        rapidjson::SizeType i = 0;
+        rapidjson::SizeType j = 0;
+        response.SetArray();
+
+        for(i = 0 ; i < root.Size() ; i++)
         {
-          Json::Value ret;
+          Value ret;
           Process(root[i], ret);
           
-          if(ret != Json::Value::null)
+          if(ret != Value())
           {
             /* it is not a notification, add to array of responses */
-            response[j] = ret;
+            response.PushBack(ret, d.GetAllocator());
             j++;
           }
         }
@@ -225,7 +244,7 @@ namespace Json
       }
     }
 
-    bool Handler::Process(const char* msg, Json::Value& response)
+    bool Handler::Process(const char* msg, rapidjson::Value& response)
     {
       std::string str(msg);
 
@@ -245,5 +264,5 @@ namespace Json
       return 0;
     }
   } /* namespace Rpc */
-} /* namespace Json */
+RAPIDJSON_NAMESPACE_END /* namespace rapidjson */
 
