@@ -1,4 +1,7 @@
 /*
+ *  RapidJsonRpc-Cpp - JSON-RPC implementation.
+ *  Copyright (C) 2018-2021 Stephen Liang <stephen_liang@163.com>
+ *
  *  JsonRpc-Cpp - JSON-RPC implementation.
  *  Copyright (C) 2008-2011 Sebastien Vincent <sebastien.vincent@cppextrem.com>
  *

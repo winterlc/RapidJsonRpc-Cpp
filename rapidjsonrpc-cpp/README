@@ -1,15 +1,15 @@
-rapidjsonRpc-Cpp
+RapidJsonRpc-Cpp
 ===========
 
 Introduction
 ------------
-rapidjsonRpc-Cpp is a reimplementation of JsonRpc-Cpp.
+RapidJsonRpc-Cpp is a reimplementation of JsonRpc-Cpp.
 
-It's original implementation in (https://sourceforge.net/projects/jsonrpc-cpp/) and uses JsonCpp library (http://jsoncpp.sourceforge.net/) to encode/decode JSON messages.
+It's original implementation library(https://sourceforge.net/projects/jsonrpc-cpp/) uses JsonCpp library (http://jsoncpp.sourceforge.net/) to encode/decode JSON messages.
 
-rapidjsonRpc-Cpp library is a C++ implementation of JSON-RPC 2.0 protocol (http://www.jsonrpc.org/specification).
+RapidJsonRpc-Cpp library is a C++ implementation of JSON-RPC 2.0 protocol (http://www.jsonrpc.org/specification).
 
-It uses rapidjson library (https://github.com/Tencent/rapidjson) to encode/decode JSON messages.
+It uses RapidJSON library (https://github.com/Tencent/rapidjson) to encode/decode JSON messages.
 
 Compilation and installation
 ----------------------------
